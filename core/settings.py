@@ -54,7 +54,7 @@ quick_upscale_resize = 2.0
 
 # AIYA won't generate if prompt has any words in the ban list
 # Separate with commas; example, ["a", "b", "c"]
-prompt_ban_list = []
+prompt_ban_list = ["child", "children", "kid", "kids"]
 # These words will be automatically removed from the prompt
 prompt_ignore_list = []
 # Choose whether or not ignored words are displayed to user
@@ -165,9 +165,11 @@ def prompt_mod(prompt, negative_prompt):
     clean_negative_prompt = negative_prompt
     # if any banned words are in prompt, return immediately
     if global_var.prompt_ban_list:
+        prompt_lower = prompt.lower()
         for x in global_var.prompt_ban_list:
             x = str(x.lower())
-            if x in prompt.lower():
+            # Check with word boundaries to avoid false positives
+            if re.search(r'\b' + re.escape(x) + r'\b', prompt_lower):
                 return "Stop", x
     # otherwise mod the prompt/negative prompt
     if global_var.prompt_ignore_list or global_var.negative_prompt_prefix:
